@@ -2,6 +2,7 @@ package com.sam_chordas.android.stockhawk.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -51,6 +52,7 @@ public class DetailActivity extends AppCompatActivity implements Callback<QuoteI
         pb = (ProgressBar)findViewById(R.id.progressBar);
         getSupportActionBar().setTitle(symbol);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
@@ -158,5 +160,16 @@ public class DetailActivity extends AppCompatActivity implements Callback<QuoteI
             }
         });
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

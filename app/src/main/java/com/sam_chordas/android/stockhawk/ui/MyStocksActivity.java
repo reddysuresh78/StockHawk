@@ -52,18 +52,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private QuoteCursorAdapter mCursorAdapter;
   private Context mContext;
   private Cursor mCursor;
-  boolean isConnected;
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mContext = this;
-    ConnectivityManager cm =
-        (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    isConnected = activeNetwork != null &&
-        activeNetwork.isConnectedOrConnecting();
     setContentView(R.layout.activity_my_stocks);
     // The intent service is for executing immediate pulls from the Yahoo API
     // GCMTaskService can only schedule tasks, they cannot execute immediately
@@ -71,7 +66,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     if (savedInstanceState == null){
       // Run the initialize task service so that some stocks appear upon an empty database
       mServiceIntent.putExtra("tag", "init");
-      if (isConnected){
+      if (isConnected()){
         startService(mServiceIntent);
       } else{
         networkToast();
@@ -104,7 +99,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     fab.attachToRecyclerView(recyclerView);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        if (isConnected){
+        if (isConnected()){
           new MaterialDialog.Builder(mContext).title(R.string.symbol_search)
               .content(R.string.search_title)
               .inputType(InputType.TYPE_CLASS_TEXT)
@@ -144,7 +139,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mItemTouchHelper.attachToRecyclerView(recyclerView);
 
     mTitle = getTitle();
-    if (isConnected){
+    if (isConnected()){
       long period = 3600L;
       long flex = 10L;
       String periodicTag = "periodic";
@@ -163,6 +158,17 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
       // are updated.
       GcmNetworkManager.getInstance(this).schedule(periodicTask);
     }
+  }
+
+  private boolean isConnected() {
+    ConnectivityManager cm =
+            (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+    boolean isConnected = activeNetwork != null &&
+            activeNetwork.isConnectedOrConnecting();
+
+    return isConnected;
   }
 
 
